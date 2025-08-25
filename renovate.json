@@ -1,0 +1,171 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "from {{currentVersion}} to {{newVersion}}",
+  "packageRules": [
+    {
+      "description": "Disable direct image updates when managed via helmCharts",
+      "matchManagers": ["kubernetes"],
+      "matchPaths": ["**/overlays/**", "**/base/**"],
+      "matchPackagePatterns": ["^.*?/.*?"],
+      "enabled": false
+    },
+    {
+      "description": "Major updates for overlays (separate by environment)",
+      "matchPaths": ["**/overlays/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "{{parentDir}} {{baseDir}} overlay (major)",
+      "labels": ["{{parentDir}}", "major"],
+      "commitMessagePrefix": "[{{baseDir}}] ",
+      "commitMessageAction": "Upgrade major"
+    },
+    {
+      "description": "Minor updates for overlays (separate by environment)",
+      "matchPaths": ["**/overlays/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["minor"],
+      "groupName": "{{parentDir}} {{baseDir}} overlay (minor)",
+      "labels": ["{{parentDir}}", "minor"],
+      "commitMessagePrefix": "[{{baseDir}}] ",
+      "commitMessageAction": "Upgrade minor"
+    },
+    {
+      "description": "Patch updates for overlays (group by environment)",
+      "matchPaths": ["**/overlays/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "{{parentDir}} {{baseDir}} overlay (patch)",
+      "labels": ["{{parentDir}}", "patch"],
+      "commitMessagePrefix": "[{{baseDir}}] ",
+      "commitMessageAction": "Upgrade patch"
+    },
+    {
+      "description": "Base updates (patch)",
+      "matchPaths": ["**/base/**"],
+      "matchUpdateTypes": ["patch"],
+      "matchManagers": ["kustomize"],
+      "groupName": "{{parentDir}} {{baseDir}} base (patch)",
+      "labels": ["base", "patch"],
+      "commitMessagePrefix": "[base] ",
+      "commitMessageAction": "Upgrade patch"
+    },
+    {
+      "description": "Base updates (minor)",
+      "matchPaths": ["**/base/**"],
+      "matchUpdateTypes": ["minor"],
+      "matchManagers": ["kustomize"],
+      "groupName": "{{parentDir}} {{baseDir}} base (minor)",
+      "labels": ["base", "minor"],
+      "commitMessagePrefix": "[base] ",
+      "commitMessageAction": "Upgrade minor"
+    },
+    {
+      "description": "Base updates (major)",
+      "matchPaths": ["**/base/**"],
+      "matchUpdateTypes": ["major"],
+      "matchManagers": ["kustomize"],
+      "groupName": "{{parentDir}} {{baseDir}} base (major)",
+      "labels": ["base", "major"],
+      "commitMessagePrefix": "[base] ",
+      "commitMessageAction": "Upgrade major"
+    },
+    {
+      "description": "Ignore non-YAML files in kustomize directories",
+      "matchPaths": ["**/charts/**", "**/components/**"],
+      "enabled": false
+    },
+    {
+      "description": "Major updates for images in overlays",
+      "matchPaths": ["**/overlays/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["major"],
+      "matchDatasources": ["docker"],
+      "groupName": "{{parentDir}} {{baseDir}} images (major)",
+      "labels": ["{{parentDir}}", "major", "image"],
+      "commitMessagePrefix": "[{{baseDir}}] ",
+      "commitMessageAction": "Upgrade image major"
+    },
+    {
+      "description": "Minor updates for images in overlays",
+      "matchPaths": ["**/overlays/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["minor"],
+      "matchDatasources": ["docker"],
+      "groupName": "{{parentDir}} {{baseDir}} images (minor)",
+      "labels": ["{{parentDir}}", "minor", "image"],
+      "commitMessagePrefix": "[{{baseDir}}] ",
+      "commitMessageAction": "Upgrade image minor"
+    },
+    {
+      "description": "Patch updates for images in overlays",
+      "matchPaths": ["**/overlays/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["patch"],
+      "matchDatasources": ["docker"],
+      "groupName": "{{parentDir}} {{baseDir}} images (patch)",
+      "labels": ["{{parentDir}}", "patch", "image"],
+      "commitMessagePrefix": "[{{baseDir}}] ",
+      "commitMessageAction": "Upgrade image patch"
+    },
+    {
+      "description": "Major updates for images in base",
+      "matchPaths": ["**/base/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["major"],
+      "matchDatasources": ["docker"],
+      "groupName": "{{parentDir}} {{baseDir}} images (major)",
+      "labels": ["base", "major", "image"],
+      "commitMessagePrefix": "[base] ",
+      "commitMessageAction": "Upgrade image major"
+    },
+    {
+      "description": "Minor updates for images in base",
+      "matchPaths": ["**/base/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["minor"],
+      "matchDatasources": ["docker"],
+      "groupName": "{{parentDir}} {{baseDir}} images (minor)",
+      "labels": ["base", "minor", "image"],
+      "commitMessagePrefix": "[base] ",
+      "commitMessageAction": "Upgrade image minor"
+    },
+    {
+      "description": "Patch updates for images in base",
+      "matchPaths": ["**/base/**"],
+      "matchManagers": ["kustomize"],
+      "matchUpdateTypes": ["patch"],
+      "matchDatasources": ["docker"],
+      "groupName": "{{parentDir}} {{baseDir}} images (patch)",
+      "labels": ["base", "patch", "image"],
+      "commitMessagePrefix": "[base] ",
+      "commitMessageAction": "Upgrade image patch"
+    }
+  ],
+  "enabledManagers": [
+    "kubernetes",
+    "kustomize",
+    "docker-compose",
+    "dockerfile",
+    "github-actions"
+  ],
+  "kubernetes": {
+    "fileMatch": ["(^|/)kustomization\\.yaml$"],
+    "ignorePaths": ["**/values.yaml"]
+  },
+  "kustomize": {
+    "fileMatch": ["(^|/)kustomization\\.yaml$"]
+  },
+  "ignorePaths": ["**/README.md", "**/*.png"],
+  "platformAutomerge": false,
+  "automergeType": "pr",
+  "dependencyDashboard": true,
+  "repositories": [
+    "mawi001/scaling-octo-system"
+  ],
+  "onboarding": false,
+  "requireConfig": "optional"
+}
