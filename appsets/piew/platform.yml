@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: https://github.com/mawi001/scaling-octo-system.git
+      revision: HEAD
+      directories:
+      - path: platform/*/overlays/piew
+  ignoreApplicationDifferences:
+    - jsonPointers:
+        - /spec/syncPolicy
+  template:
+    metadata:
+      name: '{{index .path.segments 1}}-{{index .path.segments 3}}'
+    spec:
+      # The project the application belongs to.
+      project: platform
+      # Source of the application manifests
+      source:
+        repoURL: https://github.com/mawi001/scaling-octo-system.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+
+      # Destination cluster and namespace to deploy the application
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{index .path.segments 1}}'
+
+      # Sync policy
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated: # automated sync by default retries failed attempts 5 times with following delays between attempts ( 5s, 10s, 20s, 40s, 80s ); retry controlled using `retry` field.
+          prune: false # Specifies if resources should be pruned during auto-syncing ( false by default ).
+          selfHeal: false # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
+
+  templatePatch: |
+    metadata:
+      annotations:
+        {{- $app := index .path.segments 1 -}}
+        {{- $apps := dict
+          "keycloak" (dict
+            "images" (list
+              (dict "alias" "themes" "name" "registry.digitalocean.com/mawi001/keycloak:main" "strategy" "digest")
+            )
+            "writeBackMethod" "git"
+            "writeBackTarget" "kustomization"
+            "gitBranch" "main"
+          )
+        -}}
+        {{- with index $apps $app }}
+        {{- /* Build image-list with aliases */ -}}
+        {{- $imageList := list -}}
+        {{- range $img := .images }}
+        {{- $imageList = append $imageList (printf "%s=%s" $img.alias $img.name) -}}
+        {{- end }}
+        argocd-image-updater.argoproj.io/image-list: "{{ join "," $imageList }}"
+
+        {{- /* Per-image update strategy annotations using aliases */ -}}
+        {{- range $img := .images }}
+        argocd-image-updater.argoproj.io/{{ $img.alias }}.update-strategy: "{{ $img.strategy }}"
+        {{- end }}
+
+        argocd-image-updater.argoproj.io/write-back-method: "{{ .writeBackMethod }}"
+        argocd-image-updater.argoproj.io/write-back-target: "{{ .writeBackTarget }}"
+        {{- if .gitBranch }}
+        argocd-image-updater.argoproj.io/git-branch: "{{ .gitBranch }}"
+        {{- end }}
+        {{- end }}
