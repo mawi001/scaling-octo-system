@@ -1,0 +1,4 @@
+kustomize:
+  buildOptions:
+    - --load-restrictor=LoadRestrictionsNone
+    - --enable-helm
