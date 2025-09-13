@@ -27,3 +27,6 @@ tolerations:
 configs:
   params:
     server.insecure: true
+  cm:
+    # Global Kustomize options
+    kustomize.buildOptions: "--enable-helm --load-restrictor=LoadRestrictionsNone"
