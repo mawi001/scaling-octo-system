@@ -52,3 +52,9 @@ hubble:
     enabled: true
   ui:
     enabled: true
+
+  tls:
+    auto:
+      enabled: true
+      method: cronJob # generate certificates using hubble's hubblecertgen (check the hubblecertgen section for more details in cilium's helm values file)
+      certValidityDuration: 1095
