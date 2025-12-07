@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: kube-system
 
+resources:
+  - ip-pool.yml
+
 helmCharts:
   - name: cilium
     releaseName: cilium
