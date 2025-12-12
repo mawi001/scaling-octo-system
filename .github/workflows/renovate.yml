@@ -16,7 +16,7 @@ jobs:
         env: ['renovate']
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-      - uses: renovatebot/github-action@c91a61c730fa166439cd3e2c300c041590002b1d # v44.0.3
+      - uses: renovatebot/github-action@502904f1cefdd70cba026cb1cbd8c53a1443e91b # v44.1.0
         name: Run Renovate (${{ matrix.env }})
         with:
           configurationFile: ${{ matrix.env }}.json
