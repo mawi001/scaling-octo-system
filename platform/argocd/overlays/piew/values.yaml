@@ -3,6 +3,11 @@
 redis-ha:
   enabled: true
 
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+
 controller:
   replicas: 1
 
@@ -18,11 +23,6 @@ repoServer:
 
 applicationSet:
   replicas: 2
-
-tolerations:
-  - key: "node-role.kubernetes.io/control-plane"
-    operator: "Exists"
-    effect: "NoSchedule"
 
 configs:
   params:
