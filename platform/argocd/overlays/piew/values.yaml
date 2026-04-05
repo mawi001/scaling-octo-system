@@ -2,8 +2,12 @@
 # https://artifacthub.io/packages/helm/argo/argo-cd
 redis-ha:
   enabled: true
-
   tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+  haproxy:
+    tolerations:
     - key: "node-role.kubernetes.io/control-plane"
       operator: "Exists"
       effect: "NoSchedule"
