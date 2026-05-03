@@ -4,12 +4,21 @@ metadata:
   name: argocd-route
   namespace: argocd
 spec:
-  parentRefs:
-  - name: piew-gateway
-    namespace: cloudflare-gateway
   hostnames:
-  - cd.iot-nerd.nl
+    - cd.iot-nerd.nl
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: piew-gateway
+      namespace: cloudflare-gateway
   rules:
-  - backendRefs:
-    - name: argocd-server
-      port: 80
+    - backendRefs:
+        - group: ''
+          kind: Service
+          name: argocd-server
+          port: 80
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
